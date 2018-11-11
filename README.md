@@ -1,4 +1,4 @@
-### Example
+<!-- ### Example
 
 ```
 // connectionPlans.ts
@@ -24,4 +24,15 @@ async getCustomerData() {
   
   // custom logic over customers
 }
-```
+``` -->
+
+### Todos
+
+* [ ] separate config into runtime part and init
+* [ ] add uri matcher
+* [ ] test reflection against obfuscators
+* [ ] add regex build parameters to init config
+* [ ] implement content types
+* [ ] add unit tests
+* [ ] abstract out plan factory
+* [ ] increase abstraction level for parser
