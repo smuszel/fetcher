@@ -1,0 +1,25 @@
+{
+    "name": "fetcher",
+    "version": "0.0.1",
+    "description": "<!-- ### Example",
+    "main": "test.js",
+    "scripts": {
+        "test": "tape test.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/smuszel/fetcher.git"
+    },
+    "author": "Stanislaw Muszel",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/smuszel/fetcher/issues"
+    },
+    "homepage": "https://github.com/smuszel/fetcher#readme",
+    "devDependencies": {
+        "@types/tape": "4.2.32",
+        "tape": "4.9.1",
+        "tslint": "5.11.0",
+        "typescript": "3.1.6"
+    }
+}

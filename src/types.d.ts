@@ -11,9 +11,12 @@ interface ConnectionPlan {
 }
 
 interface FetcherConfig {
-    uriBase: string,
-    jwt: string,
     requestMethods: {[key: string]: Deserializer }
     responseActions: {[status: number]: ResponseAction },
     deserializers: {[key: string]: Deserializer }
+}
+
+interface FetcherParameters {
+    jwt: string,
+    uriBase: string,
 }
