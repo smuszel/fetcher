@@ -1,11 +1,22 @@
 import { fetchWrapper } from "wrapper";
+import { connectionTemplateParser } from "connectionTemplateParser";
 
 export const initialize = (config: FetcherConfig) => {
-    const wrapper = fetchWrapper(config.responseActions);
+    const fetchExt = fetchWrapper(config.responseActions);
+    const parse = connectionTemplateParser(config.deserializers, config.requestMethods)
 
     const fetcher = (template, params, payload?) => {
-        const plan = planFactory(template, params);
-        const result = wrapper(plan)(payload);
+        const { uriTemplate, ...rawPlan } = parse(template);
+        const uri = matchUriTemplate(uriTemplate, params);
+        const auth = { 'Authorization': `Bearer ${rawPlan.jwt}` };
+
+        const plan = {
+            uri,
+            auth,
+            ...rawPlan
+        }
+
+        const result = fetchExt(plan)(payload);
 
         return result
     }
@@ -13,13 +24,8 @@ export const initialize = (config: FetcherConfig) => {
     return fetcher;
 }
 
-const planFactory = (template, params) => {
+const matchUriTemplate = (a, b) => ''
 
-}
-
-const getAuth = async () => {
-    // Token providing logic
-    let token;
-
-    return { 'Authorization': `Bearer ${token}` };
-}
+// const planFactory = (template, params) => {
+//     const 
+// }

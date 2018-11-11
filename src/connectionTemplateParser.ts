@@ -1,17 +1,11 @@
-const contentTypeOptions = Object.keys(deserializers).join('|');
-const methodOptions = Object.keys(requestMethods).join('|');
+import { RegExpExt } from "RegExpExt";
 
-export const reg = new RegExp(`(${contentTypeOptions})?;(${methodOptions})?@([\\s\\S]+)`);
+export const connectionTemplateParser = (deserializers, requestMethods) => {
+    const contentTypeOptions = Object.keys(deserializers).join('|');
+    const methodOptions = Object.keys(requestMethods).join('|');
+    const reg = new RegExpExt(`(${contentTypeOptions})?;(${methodOptions})?@([\\s\\S]+)`);
+    const keys = ['deserialize', 'requestMethod', 'uriTemplate'];
 
-const hydrate: any = (plan: ConnectionPlan) => (_, ct, m, template) => {
-    plan.deserialize = deserializers[ct || 'j']
-    plan.requestMethod = requestMethods[m || 'g'];
-    plan.template = template;
-};
-
-const parse = (str: string) => {
-    let plan = {} as ConnectionTemplate;
-    str.replace(reg, hydrate(plan));
-
-    return plan;
+    return str => reg.parse(str, keys);
 }
+
