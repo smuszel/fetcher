@@ -1,1 +1,0 @@
-export const jsonContent = { 'Content-Type': 'application/json' };
