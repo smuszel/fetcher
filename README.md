@@ -28,11 +28,10 @@ async getCustomerData() {
 
 ### Todos
 
-* [ ] separate config into runtime part and init
-* [ ] add uri matcher
-* [ ] test reflection against obfuscators
+* [x] separate config into runtime part and init
+* [x] add uri matcher
 * [ ] add regex build parameters to init config
 * [ ] implement content types
 * [ ] add unit tests
-* [ ] abstract out plan factory
-* [ ] increase abstraction level for parser
+* [ ] figure out how to parametrize group mappings
+* [ ] add serializeUriParameterStrategies
