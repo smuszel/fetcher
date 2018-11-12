@@ -30,8 +30,10 @@ async getCustomerData() {
 
 * [x] separate config into runtime part and init
 * [x] add uri matcher
-* [ ] add regex build parameters to init config
-* [ ] implement content types
+* [ ] add template delimiters configuration
 * [ ] add unit tests
-* [ ] figure out how to parametrize group mappings
+* [ ] figure out how to create group mappings based on config keys
 * [ ] add serializeUriParameterStrategies
+* [ ] maybe merge accept + deserializers into tuple
+* [ ] break up fetcher into smaller, memoizable functions
+* [ ] refactor matchUriTemplate
