@@ -1,7 +1,7 @@
 {
     "compileOnSave": true,
     "compilerOptions": {
-        "module": "es6",
+        "module": "commonjs",
         "moduleResolution": "node",
         "baseUrl": "./src",
         "target": "es2018",

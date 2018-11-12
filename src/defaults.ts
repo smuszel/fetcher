@@ -6,22 +6,26 @@ export const requestMethods = {
     m: 'PATCH'
 }
 
-export const deserializers = {
-    j: r => r.json(),
-    b: r => r.blob(),
-    t: r => r.text(),
-}
-
-export const serializers = {
-    j: obj => JSON.stringify(obj)
+export const contentTypes = {
+    j: [r => r.json(), 'application/json'],
+    b: [r => r.blob(), ''],
+    t: [r => r.text(), ''],
 }
 
 export const acceptTypes = {
-    j: 'application/json'
-}
-
-export const contentTypes = {
-    j: 'application/json'
+    j: [obj => JSON.stringify(obj), 'application/json']
 }
 
 export const uriBase = '';
+
+export const responseActions = {
+    200: r => r
+}
+
+export const defaultFetcherConfig = {
+    acceptTypes,
+    contentTypes,
+    requestMethods,
+    responseActions,
+    uriBase
+} as any

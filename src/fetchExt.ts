@@ -1,14 +1,17 @@
-import { matchUriTemplate } from "matchUriTemplate";
-
-const stringBase = 'accept;contentType;requestMetod;uriTemplate';
+import { matchUriTemplate } from "./matchUriTemplate";
 
 const someParser = (mappings, str) => {
     const rs = mappings.map(m => `(${m})?`).join(';');
-    return str.match(new RegExp(rs)).splice(1, mappings.length)
+    const results = str.match(new RegExp(rs)).splice(1, mappings.length);
+    return results;
 }
 
 export const fetchExt = (config: FetcherConfig) => planStr => uriParams => async (payload?) => {
-    const groupMappings = ['j|b', 'j|b', 'g|c' , '[\\s\\S]+'];
+    const acceptGroup = Object.keys(config.acceptTypes).join('|');
+    const contentTypeGroup = Object.keys(config.contentTypes).join('|');
+    const requestMethodGroup = Object.keys(config.requestMethods).join('|');
+    const uriTemplateGroup = '[\\s\\S]+';
+    const groupMappings = [acceptGroup, contentTypeGroup, requestMethodGroup, uriTemplateGroup];
     const [
         acceptType,
         contentType,
@@ -16,13 +19,19 @@ export const fetchExt = (config: FetcherConfig) => planStr => uriParams => async
         uriTemplate,
     ] = someParser(groupMappings, planStr);
 
-    const body = payload && await config.serializers[contentType](payload);
+    const serializer = config.contentTypes[contentType][0];
+    const ct = config.contentTypes[contentType][1]
     const method = config.requestMethods[requestMethod];
+    const deserializer = config.acceptTypes[acceptType][0];
+    const accept = config.acceptTypes[acceptType][1];
+    const checker = response => config.responseActions[response.status];
+
+    const body = payload && await serializer(payload);
     const url = config.uriBase + matchUriTemplate(uriTemplate, uriParams);
 
     const headers = {
-        'Content-Type': config.contentTypes[contentType],
-        'Accept': config.acceptTypes[acceptType]
+        'Content-Type': ct,
+        accept
     };
 
     const init = {
@@ -32,8 +41,8 @@ export const fetchExt = (config: FetcherConfig) => planStr => uriParams => async
     };
 
     const response = await fetch(url, init);
-    const checkedResponse = await config.responseActions[response.status](response)
-    const result = checkedResponse && await config.deserializers[acceptType](response);
+    const checkedResponse = await checker(response)
+    const result = checkedResponse && await deserializer(response);
     
     return result;
 }

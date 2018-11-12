@@ -7,9 +7,7 @@ type ContentType = 'application/json'
 interface FetcherConfig {
     requestMethods: {[key: string]: RequestMethod },
     responseActions: {[status: number]: ResponseAction },
-    serializers: {[key: string]: Serializer },
-    deserializers: {[key: string]: Deserializer },
-    contentTypes: {[key: string]: ContentType },
-    acceptTypes: {[key: string]: ContentType },
+    contentTypes: {[key: string]: [Serializer, ContentType] },
+    acceptTypes: {[key: string]: [Deserializer, ContentType] },
     uriBase: any
 }
