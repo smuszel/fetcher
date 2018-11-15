@@ -1,36 +1,54 @@
 import { matchUriTemplate } from "./matchUriTemplate";
 
-const someParser = (mappings, str) => {
-    const rs = mappings.map(m => `(${m})?`).join(';');
-    const results = str.match(new RegExp(rs)).splice(1, mappings.length);
-    return results;
+const anyMatch = '[\\s\\S]+';
+
+const createParser = (config: BaseConfig) => {
+    const configKeys = Object.keys(config);
+    const configValues = Object.values(config)
+    const optionGroups = configValues.map(c => Object.keys(c).join('|'));
+    const allGroups = [...optionGroups, anyMatch];
+    const pattern = allGroups.map(g => `(${g})`).join(';');
+
+    const parser = str => {
+        const configBase = {} as any
+        const matches = str.match(new RegExp(pattern)).slice(1);
+        matches.forEach((m, ix) => {
+            configBase[configKeys[ix]] = m || configValues[0];
+        });
+
+        return [configBase, matches[matches.length - 1]];
+    }
+
+    return parser;
 }
 
-export const fetchExt = (config: FetcherConfig) => planStr => uriParams => async (payload?) => {
-    const acceptGroup = Object.keys(config.acceptTypes).join('|');
-    const contentTypeGroup = Object.keys(config.contentTypes).join('|');
-    const requestMethodGroup = Object.keys(config.requestMethods).join('|');
-    const uriTemplateGroup = '[\\s\\S]+';
-    const groupMappings = [acceptGroup, contentTypeGroup, requestMethodGroup, uriTemplateGroup];
-    const [
-        acceptType,
-        contentType,
-        requestMethod,
-        uriTemplate,
-    ] = someParser(groupMappings, planStr);
+export const fetchExt = baseConfig => {
+    const parser = createParser(baseConfig);
 
-    const serializer = config.contentTypes[contentType][0];
-    const ct = config.contentTypes[contentType][1]
-    const method = config.requestMethods[requestMethod];
-    const deserializer = config.acceptTypes[acceptType][0];
-    const accept = config.acceptTypes[acceptType][1];
-    const checker = response => config.responseActions[response.status];
+    return f(parser)
+}
 
+const f = parser => uriBase => responseActions => planStr => uriParams => {
+    const checker = response => responseActions[response.status];
+    const [configBase, uriTemplate] = parser(planStr);
+    const url = uriBase + matchUriTemplate(uriTemplate, uriParams);
+
+    const config = {
+        ...configBase,
+        url,
+        checker
+    };
+
+    return h(config)
+}
+ 
+
+const h = config => async (payload?) => {
+    const { deserializer, serializer, method, accept, contentType, url, checker } = config;
     const body = payload && await serializer(payload);
-    const url = config.uriBase + matchUriTemplate(uriTemplate, uriParams);
 
     const headers = {
-        'Content-Type': ct,
+        'Content-Type': contentType,
         accept
     };
 
@@ -41,7 +59,7 @@ export const fetchExt = (config: FetcherConfig) => planStr => uriParams => async
     };
 
     const response = await fetch(url, init);
-    const checkedResponse = await checker(response)
+    const checkedResponse = await checker(response);
     const result = checkedResponse && await deserializer(response);
     
     return result;
